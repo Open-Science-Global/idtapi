@@ -5,11 +5,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/url"
-	"os"
 	"strconv"
 	"strings"
-
-	"github.com/joho/godotenv"
 )
 
 type Authentication struct {
@@ -29,23 +26,13 @@ type Problem struct {
 	StartIndex      int     `json:"StartIndex"`
 }
 
-func GetComplexityScore(sequences []string) [][]Problem {
+func GetComplexityScore(sequences []string, username string, password string, encondedAuth string, urlPath string, urlToken string) [][]Problem {
 	var sequencesInput []Sequence
 	for i, sequence := range sequences {
 		sequencesInput = append(sequencesInput, Sequence{"#" + strconv.Itoa(i), sequence})
 	}
-	err := godotenv.Load(".env")
 
-	if err != nil {
-		panic("Error loading .env file")
-	}
-
-	username := os.Getenv("USERNAME")
-	password := os.Getenv("PASSWORD")
-	encondedAuth := os.Getenv("ENCONDED_AUTH")
-	urlPath := os.Getenv("COMPLEXITY_URL")
-
-	auth := getToken(username, password, encondedAuth)
+	auth := getToken(username, password, encondedAuth, urlToken)
 	requestByte, _ := json.Marshal(sequencesInput)
 	req, _ := http.NewRequest("POST", urlPath, bytes.NewReader(requestByte))
 	req.Header.Set("Content-Type", "application/json")
@@ -71,16 +58,14 @@ func GetComplexityScore(sequences []string) [][]Problem {
 	return gBlockAnalyzed
 
 }
-func getToken(username string, password string, encondedAuth string) Authentication {
-	urlPath := os.Getenv("TOKEN_URL")
-
+func getToken(username string, password string, encondedAuth string, urlToken string) Authentication {
 	data := url.Values{}
 	data.Set("grant_type", "password")
 	data.Set("username", username)
 	data.Set("password", password)
 	data.Set("scope", "test")
 
-	req, err := http.NewRequest("POST", urlPath, strings.NewReader(data.Encode()))
+	req, err := http.NewRequest("POST", urlToken, strings.NewReader(data.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Authorization", encondedAuth)
 
