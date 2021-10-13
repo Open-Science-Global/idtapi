@@ -16,11 +16,11 @@ func ExampleGetComplexityScore() {
 
 	username := os.Getenv("USERNAME")
 	password := os.Getenv("PASSWORD")
-	encodedAuth := os.Getenv("ENCODED_AUTH")
 	urlPath := os.Getenv("COMPLEXITY_URL")
 	urlToken := os.Getenv("TOKEN_URL")
 	sequences := []string{"TGGTACGAAAATTAGGGGATCTACCTAGAAAGCCACAAGGCGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATAGGTCAAGCTTAAAGAACCCTTACATGGATCTTACAGATTCTGAAAGTAAAGAAACAACAGAGGTTAAACAAACAGAACCAAAAAGAAAAAAAGCATTGTTGAAAACAATGAAAGTTGATGTTTCAATCCATAATAAGATTAAATCGCTGCACGAAATTCTGGCAGCATCCGAAGGAAAAA"}
-	fmt.Println(GetComplexityScore(sequences, username, password, encodedAuth, urlPath, urlToken))
+	fmt.Println(GetComplexityScore(sequences, username, password, "friendzymes001", "66d054be-f056-4a62-846a-e4b1f84baba7", urlPath, urlToken))
+
 	//Output: H
 }
 
@@ -31,12 +31,13 @@ func ExampleGetToken() {
 		panic("Error loading .env file")
 	}
 
-	username := os.Getenv("USERNAME")
-	password := os.Getenv("PASSWORD")
-	encondedAuth := os.Getenv("ENCODED_AUTH")
-	urlToken := os.Getenv("TOKEN_URL")
+	username := "friendzymes"
+	password := "Open3000"
 
-	auth := getToken(username, password, encondedAuth, urlToken)
-	fmt.Println(auth)
+	fmt.Println("USERNAME: ", username)
+	fmt.Println("PASSWORD: ", password)
+
+	token := GetToken(username, password, "friendzymes001", "66d054be-f056-4a62-846a-e4b1f84baba7", "https://www.idtdna.com/Identityserver/connect/token")
+	fmt.Println(token)
 	//Output: Hello
 }

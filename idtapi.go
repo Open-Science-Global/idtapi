@@ -26,13 +26,13 @@ type Problem struct {
 	StartIndex      int     `json:"StartIndex"`
 }
 
-func GetComplexityScore(sequences []string, username string, password string, encondedAuth string, urlPath string, urlToken string) [][]Problem {
+func GetComplexityScore(sequences []string, username string, password string, clientId string, clientSecret string, urlPath string, urlToken string) [][]Problem {
 	var sequencesInput []Sequence
 	for i, sequence := range sequences {
 		sequencesInput = append(sequencesInput, Sequence{"#" + strconv.Itoa(i), sequence})
 	}
 
-	auth := getToken(username, password, encondedAuth, urlToken)
+	auth := GetToken(username, password, clientId, clientSecret, urlToken)
 	requestByte, _ := json.Marshal(sequencesInput)
 	req, _ := http.NewRequest("POST", urlPath, bytes.NewReader(requestByte))
 	req.Header.Set("Content-Type", "application/json")
@@ -58,25 +58,29 @@ func GetComplexityScore(sequences []string, username string, password string, en
 	return gBlockAnalyzed
 
 }
-func getToken(username string, password string, encondedAuth string, urlToken string) Authentication {
+
+func GetToken(username string, password string, clientId string, clientSecret string, urlToken string) Authentication {
 	data := url.Values{}
 	data.Set("grant_type", "password")
 	data.Set("username", username)
 	data.Set("password", password)
 	data.Set("scope", "test")
 
-	req, err := http.NewRequest("POST", urlToken, strings.NewReader(data.Encode()))
+	req, _ := http.NewRequest("POST", urlToken, strings.NewReader(data.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.Header.Set("Authorization", encondedAuth)
+	req.SetBasicAuth(clientId, clientSecret)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
+
 	if err != nil {
 		panic(err)
 	}
+
 	defer resp.Body.Close()
 
 	auth := Authentication{}
+
 	if resp.Status == "200 OK" {
 		err := json.NewDecoder(resp.Body).Decode(&auth)
 
@@ -86,5 +90,7 @@ func getToken(username string, password string, encondedAuth string, urlToken st
 
 		return auth
 	}
+
 	return auth
+
 }
