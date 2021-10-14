@@ -3,6 +3,8 @@ package idtapi
 import (
 	"bytes"
 	"encoding/json"
+	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -89,6 +91,13 @@ func GetToken(username string, password string, clientId string, clientSecret st
 		}
 
 		return auth
+	} else {
+		b, err := io.ReadAll(resp.Body)
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		log.Fatalln(string(b))
 	}
 
 	return auth
