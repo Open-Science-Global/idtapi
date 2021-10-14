@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"strconv"
 	"strings"
 )
 
@@ -28,14 +27,10 @@ type Problem struct {
 	StartIndex      int     `json:"StartIndex"`
 }
 
-func GetComplexityScore(sequences []string, username string, password string, clientId string, clientSecret string, urlPath string, urlToken string) [][]Problem {
-	var sequencesInput []Sequence
-	for i, sequence := range sequences {
-		sequencesInput = append(sequencesInput, Sequence{"#" + strconv.Itoa(i), sequence})
-	}
+func GetComplexityScore(sequences []Sequence, username string, password string, clientId string, clientSecret string, urlPath string, urlToken string) [][]Problem {
 
 	auth := GetToken(username, password, clientId, clientSecret, urlToken)
-	requestByte, _ := json.Marshal(sequencesInput)
+	requestByte, _ := json.Marshal(sequences)
 	req, _ := http.NewRequest("POST", urlPath, bytes.NewReader(requestByte))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", auth.Type+" "+auth.Token)
